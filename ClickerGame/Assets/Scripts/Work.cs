@@ -20,6 +20,7 @@ public class Work : MonoBehaviour
             if(EventSystem.current.IsPointerOverGameObject() == false)
             {
                 GetComponent<Animator>().SetTrigger("click");
+                Debug.Log("click");
             }
         }
     }
