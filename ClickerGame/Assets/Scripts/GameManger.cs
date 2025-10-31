@@ -4,6 +4,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
+using Unity.VisualScripting;
+
+public class SaveData
+{
+
+}
 
 public class GameManger : MonoBehaviour
 {
@@ -18,7 +24,11 @@ public class GameManger : MonoBehaviour
     public long employeeIncreasePrice;
     public long employeeIncreaseAmount;
 
+    public int width; //최대 직원 수
+    public float space;
+
     public GameObject moneyPrefab;
+    public GameObject employeePrefab;
     public GameObject panelPrice;
     public GameObject panelRecruit;
     public GameObject moneyobj;
@@ -29,11 +39,14 @@ public class GameManger : MonoBehaviour
 
     public TextMeshProUGUI money_txt;
     public TextMeshProUGUI price_txt;
+    public TextMeshProUGUI peson_txt;
     public TextMeshProUGUI recruit_txt;
+
     void Start()
     {
         moneyIncreaseAmount = 100;
         moneyIncreasePrice = 200;
+        employeeIncreasePrice = 500;
 
     }
 
@@ -45,6 +58,11 @@ public class GameManger : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+
         UpdateUI();
         MoneyIncrease();
         UpdateUpgradePanel();
@@ -55,6 +73,8 @@ public class GameManger : MonoBehaviour
     void UpdateUI()
     {
         money_txt.text = $"{money:F0}원";
+
+        peson_txt.text = $"{employeeCount:F0}명";
     }
 
     void MoneyIncrease()
@@ -95,6 +115,19 @@ public class GameManger : MonoBehaviour
             moneyIncreasePrice = moneyIncreaseLevel * 500;
         }
     }
+
+    public void UpgradeRecruit()
+    {
+        if (money >= employeeIncreasePrice)
+        {
+            money -= employeeIncreasePrice;
+            employeeCount++;
+            employeeIncreasePrice = employeeCount * 1000;
+
+            CreateEmployee();
+
+        }
+    }
     public void ButtonActiveCheack()
     {
         if (money >= moneyIncreasePrice)
@@ -112,13 +145,57 @@ public class GameManger : MonoBehaviour
         }
         else
         {
-            buttonRecruit.interactable=! false;
+            buttonRecruit.interactable= false;
         }
     }
 
-    public void PanelSwitch()
+    public void MoneyPanelSwitch()
     {
         moneyobj.SetActive(!moneyobj.activeSelf);
+
+    }
+
+    public void RecruitPanelSwitch()
+    {
         recruitobj.SetActive(!recruitobj.activeSelf);
     }
+
+    void CreateEmployee()
+    {
+        Vector2 bossSpot = GameObject.Find("boss").transform.position;
+
+        float employeeX = bossSpot.x + (employeeCount % width) * space;
+        float employeeY = bossSpot.y - (employeeCount / width) * space;
+
+        Instantiate(employeePrefab, new Vector2(employeeX,employeeY), Quaternion.identity);
+    }
+
+    private void OnApplicationQuit()
+    {
+        PlayerPrefs.SetString("MONEY", money.ToString());
+    }
+
+    void Save()
+    {
+        SaveData saveData = new SaveData();
+    }
+
+    void Load()
+    {
+        SaveData saveData = new SaveData();
+    }
+
+    void FillEmployee()
+    {
+        GameObject[] employees = GameObject.FindGameObjectsWithTag("Employee");
+        if (employeeCount != employees.Length)
+        {
+            for (int i = employees.Length; i <= employeeCount; i++)
+            {
+
+            }
+        }
+    }
+
+    
 }
